@@ -3,32 +3,15 @@ layout: page
 title: About Me
 image:
   feature: abstract-5.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
 comments: false
 modified: 2015-07-24
 ---
 
-They say three times the charm, so here is another free responsive Jekyll blog theme for you. I've learned a ton since open sourcing my first two themes [on Github](http://github.com/mmistakes), and wanted to try a few new things this time around. 
+Computer scientist specialising in Information Retrieval and Machine Intelligence. Programming in C, C++, Delphi, Java, Python and Javascript for about 30 years.
 
-If you've used any of [my other themes](http://mademistakes.com/work/jekyll-themes/) most of this should be familiar territory...
+My interest in computing started in the early 80s with the arrival of a <a href="https://en.wikipedia.org/wiki/ZX81" target="_blank">Sinclair ZX81</a> in our house. The first program I wrote for it tried to mimic the teleprinter that used to present the football scores by 'typing' out a message at a predetermined rate and with a little flashing cursor. This worked brilliantly until a truck drove past our house and wobbled the 16k RAM pack, crashing the machine a losing my two hours(!!) of hard typing. It was a valuable lesson in the potential frustrations of computing.
 
-## What HPSTR brings to the table:
+A couple of years later, however, we got a <a href="https://en.wikipedia.org/wiki/BBC_Micro" target="_blank">BBC Model B</a>. This was an amazing machine and as with many other people in the UK at the time, cemented my love affair with the computer. The BBC Basic (with true procedures and functions, not 'subroutines') and easy access to 6502 assembler, facilitated the creation of some proper software (a friend and I even wrote a windowing system for it that was able to use the AMX mouse). A disk drive allowed the software to be saved and distributed and it didn't suffer from passing truck vibrations. The 'user port' allowed experimentation with external hardware and I developed (along with a small team at school) numerous small robotics and sensing projects, even implementing a scripting language called RABL (I forget what that stood for). The addition of a <a href="http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Acorn_ANV02_Music500.html" target="_blank">Music 500 synthesizer</a> meant that I could start experimenting with electronic music - still one of my main hobbies when I have time.
 
-* Responsive templates for post, page, and post index `_layouts`. Looks great on mobile, tablet, and desktop devices.
-* Gracefully degrads in older browsers. Compatible with Internet Explorer 8+ and all modern browsers.  
-* Modern and minimal design.
-* Sweet animated menu.
-* Background image support.
-* Readable typography to make your words shine.
-* Support for large images to call out your favorite posts.
-* Built-in support for Sass courtesy of Jekyll 2.x.
-* Optional [Disqus](http://disqus.com) comments.
-* Simple and clear permalink structure[^1].
-* [Open Graph](https://developers.facebook.com/docs/opengraph/) and [Twitter Cards](https://dev.twitter.com/docs/cards) support for a better social sharing experience.
-* Simple [custom 404 page]({{ site.url }}/404.html) to get you started.
-* Stylesheets for Pygments and Coderay [syntax highlighting]({{ site.url }}/code-highlighting-post/) to make your code examples look snazzy.
+Following school I went to Manchester Metropolitan University to study Computer Science (gaining a 1st class honours), a fascinating degree with two great points, one it was modular with a huge variety of sub-subjects to choose from and two, it was a sandwich course with a year in industry after the second year. I chose to go to France to work as a developer in the Laboratoire Technique de Brive, a branch of Philips TRT in Brive-la-Gaillarde in the centre of France. It was a fascinating time. I learned French, joined a choir there, met lots of excellent people and generally enjoyed the wonderful culture (and weather) of a smallish Southern French town. In the Lab we developed software in C, C++ and WinDev (a French scripting language) for monitoring and maintaining the microwave networks that formed the back-haul of the GSM telephone network. Learning French piqued my interest in liguistics and my final year project was an interlingua-based translator for instruction manuals (implemented in <a href="https://sicstus.sics.se/" target="_blank">Sicstus Prolog</a> and using video recorder instructions as an example).
 
-<div markdown="0"><a href="{{ site.url }}/theme-setup/" class="btn btn-info">Theme Setup</a> <a href="https://github.com/mmistakes/hpstr-jekyll-theme" class="btn btn-success">Download HPSTR</a></div>
-
-[^1]: Example: *domain.com/category-name/post-title*
