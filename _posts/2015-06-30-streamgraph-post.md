@@ -143,4 +143,4 @@ Finally, we draw the graph using SVG tags. Essentially we draw a stack of rectan
 	
 ###Example - Temperatures in 2015 in major UK cities. 
 
-The HTML is <a href="/streamgraph/streamgraph.html" target="_blank">here</a>, the Javascript is <a href="/streamgraph/streamgraph.js" target="_blank">here</a> and the data JSON is href="/streamgraph/weather-daily-temps-2015-H1.json" target="_blank">here</a>.
+The HTML is <a href="/streamgraph/streamgraph.html" target="_blank">here</a>, the Javascript is <a href="/streamgraph/streamgraph.js" target="_blank">here</a> and the data JSON is <href="/streamgraph/weather-daily-temps-2015-H1.json" target="_blank">here</a>.
