@@ -26,4 +26,4 @@ The answer to both these problems is the 'flat view'; showing all the files in a
 * File content hashing (using MD5 at present). Used to find duplicate files, either by sorting on the hash column or by using the 'Select Dupes' routine, which highlights all except the first instance of a file with a particular hash. Sorting by date, you can highlight the oldest or newest versions of files.
 * Timeline view - as far as I know, the only file manager that offers this (although I remember a Microsoft Demo for WinFS called Life Journal that did something like it). Essentially, this show all the files presented on a variable granularity timeline, allowing exploration of files temporally - sometimes you know a file by *when* you've written it.
 
-You can download it <a href="/dextree/DexTree.zip">here</a>. It is a little rough around the edges, so any bugs or suggestions are welcome.
+You can download it <a href="/dextree/DeXTree.zip">here</a>. It is a little rough around the edges, so any bugs or suggestions are welcome.
