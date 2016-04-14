@@ -39,7 +39,7 @@ function doLayout()
 	var noColumns = columnKeys.length;
 	
 	//iterate over keys, join stacks together
-	for (var i = 0; i<noColumns; i++)
+	for (i=0; i<noColumns; i++)
 	{
 		var curColumn = streamColumns[columnKeys[i]];
 
@@ -101,7 +101,7 @@ function doLayout()
 	if (proportional) yScale = columnHeight/maxColumnTotal;
 			
 	//iterate over columns, layout stacks 
-	for (var i = 0; i<columnKeys.length; i++)
+	for (i=0, ii=columnKeys.length; i<ii; i++)
 	{
 		var curColumn = streamColumns[columnKeys[i]];
 		
@@ -149,7 +149,7 @@ function doLayout()
 		if (centred) //add an offset to the y to 'centre' the stream about the midpoint of the y-axis.
 			curY -= (((maxColumnTotal - curColumn.totalScore) / 2.0) * yScale);
 		
-		for (var j = 0; j<itemKeys.length; j++)
+		for (j=0, jj=itemKeys.length; j<jj; j++)
 		{
 			var curItem = curColumn.items[itemKeys[j]];
 			
