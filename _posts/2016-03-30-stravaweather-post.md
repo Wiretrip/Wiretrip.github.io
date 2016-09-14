@@ -5,14 +5,14 @@ description: "A project to add weather information to Strava activities."
 tags: [strava, weather, api, visualisation]
 modified: 2016-03-30
 image:
-  feature: /stravaweather/stravaweather1.jpg
+  feature: /stravaweather/stravaweather2.jpg
 ---
 
-Every cyclist knows just how much of an effect the weather can have, especially wind. The wind speed and direction can mean the difference between flying along effortlessly smashing KOMs and realising that you have to keep pedalling to avoid going backwards! 
+Every cyclist knows just how much of an effect the weather can have, especially wind. The wind speed and direction can mean the difference between flying along, effortlessly smashing KOMs, and realising that you have to keep pedalling to avoid going backwards! 
 
-Which makes it all the more surprising that Strava has no provision for weather information (and, as far as I know, no plans to do so).
+Which makes it all the more surprising that Strava has no provision for weather information (and, as far as I know, no plans to add it).
 
-So I though I would have a crack.... then left it for a year thinking about how complex getting, storing and retrieving all the weather data would be... , and then found a great weather API that would hugely speed up the project at <href a="http://developer.worldweatheronline.com/api/historical-weather-api.aspx">World Weather Online</a>. So here goes....
+So I though I would have a crack, then left it for a year thinking about how complex getting, storing and retrieving all the weather data would be. By chance, I then found a great weather API that would hugely speed up the project at <a href="http://developer.worldweatheronline.com/api/historical-weather-api.aspx">World Weather Online</a>. So here goes....
 
 Essentially, it is a project of two halves :
 
@@ -21,12 +21,17 @@ Essentially, it is a project of two halves :
 
 This blog post will outline the server side code whilst the next one will describe the client.
 
-##Server side code - StravaWeatherServlet
+## Server side code - StravaWeatherServlet
 
 Essentially, the principal job of the StravaWeatherServlet is to sit between the browser client and the Strava servers, relaying requests for Strava activity data, parsing them, fetching the weather information from World Weather Online for the correct time and locations, and adding this weather info to the activity data.
 
-Activities are requested from the Strava API as an HTTP REST request using the activity unique ID. The information is returned as JSON which looks like this:
+Following an authentication step, where the servlet requests a Strava access token, the client asks the servlet to get a list of activities to choose from.
 
+When the user selects an activity, the client sends the servlet an 'activity' request with a unique activity ID. This is then used in the function 'getStravaActivityWithWeather' which issues the activity request to the Strava API.
+
+The information is returned as JSON which looks like this:
+
+```javascript
 {
   "comment_count": 0,
   "segment_efforts": [
@@ -100,127 +105,131 @@ Activities are requested from the Strava API as an HTTP REST request using the a
   "calories": 154.6,
   ...
 }
+```
 
-I have l
+I have omitted some of the data here, but each activity consists of some general information; start and end co-ordinates and date-times and a list of 'segment efforts' each of which contains start date-times and co-ordinates. These provide a set of co-ordinates in time and space that we can use to fetch weather data. 
 
-###1. Fetch an activity from
+On receiving the activity, we parse the JSON and look at each segment effort, extracting the "start_latlng" co-ordinates and the "start_date" date and time of that segment. We then use these to request weather information for a particular place and point in time.
 
-The first stage of processing is to fetch the graph's data - this arrives a json in the following format:
-
-	{"itemCountsByDate":
-		[
-		{"score":7, "partition":"BIRMINGHAM", "name":"BIRMINGHAM", "date":1393632000000},
-		{"score":6, "partition":"BRADFORD", "name":"BRADFORD", "date":1393632000000},
-		{"score":8, "partition":"BRISTOL", "name":"BRISTOL", "date":1393632000000},
-		{"score":6, "partition":"GLASGOW", "name":"GLASGOW", "date":1393632000000}...
-		{"score":9, "partition":"LEEDS", "name":"LEEDS", "date":1395360000000}
-		]
-	}
-
-Each object represents a count of items of a particular category or series ('partition') and at a particular point in time ('date' : number of milliseconds since 01/01/1970).
-
-We use jquery to fetch the data and then we 'bin' the items into particular epochs (we do this by converting the 'date' value into a sortable string representation, e.g. '2015/06/05' and adding the items to a 'StreamColumn' object representing that date).
- 
-
-	$.each( data.itemCountsByDate, 
-		  function( key, val ) 
-		  {
-			var date = new Date(val.date);
-			
-			//create 'x' scale of dates in format 'yyyy/MM/dd'
-			var dateStr = (date.getFullYear()+'/'+
-							('0'+date.getMonth()).slice(-2)+'/'+
-							('0'+date.getDate()).slice(-2));
-			var curColumn = streamColumns[dateStr];
-			if (curColumn == null)
-			{
-				//add a new column for this date
-				curColumn = new StreamColumn();
-				streamColumns[dateStr] = curColumn;
-			}
-			curColumn.addItem(val);
-		  }
-	  );
-	  
-Note that when we add an 'item' to a column, we add it as an object 'keyed' on the 'partition id' to allow us to access the items by partitionId.
-
-	StreamColumn.prototype.addItem = function(item)
+```java
+final JSONArray segmentEfforts = activity.getJSONArray("segment_efforts");
+for (int i=0; i<segmentEfforts.length(); i++)
+{
+	final JSONObject segmentEffort = segmentEfforts.getJSONObject(i);
+	if (segmentEffort.has("segment") && segmentEffort.has("start_date"))
 	{
-		this.items[item.partition] = item;
-		this.totalScore += item.score;
-	}
-	
-By now we have all the data placed into 'date' columns. Optionally, at this point we can fill in some of the blanks, either by insisting that each column 'stack' contains all of the partitions/series and adding 0 scored items where they are not already there, or by 'bridging' series across columns with missing values as below:
-
-<center><figure>
-	<img src="/images/streamgraph/bridge.jpg" alt=""></a>
-	<figcaption>Columns with a missing 'BRADFORD' bridged.</figcaption>
-</figure></center>
-
-We do this by looking at each series in a stack, checking to see if it is in the previous column, and if not, we check the column before that, if it is in that 'previous-previous column', then we add a 0 scoring item of that series to the previous column.
-
-	//insert 'bridging' items
-	for (var key in curColumn.items) 
-	{
-		var curItem = curColumn.items[key];
-		var prevItem = prevColumn.items[key]; //look for an item 
-							//from the same partition 
-							//in the previous stack
-		if (prevItem == null) //set this as this item's 'prevItem';
+		final long time = stravaDateFormat.parse(segmentEffort.getString("start_date")).getTime();
+		final JSONObject segment = segmentEffort.getJSONObject("segment");
+		if (segment.has("start_latlng"))
 		{
-			if (i>1) //check the previous-previous stack for occurrence
+			final JSONArray startLatLng = segment.getJSONArray("start_latlng");
+
+			WeatherInfo weather = 
+				getWeatherInfoByTimeAndLocation(weatherAccessToken, 
+												time, startLatLng.getDouble(0), 
+												startLatLng.getDouble(1));
+
+			if (weather!=null)
 			{
-				var prevPrevColumn = streamColumns[columnKeys[i-2]];
-				var prevPrevItem = prevPrevColumn.items[key];
-			
-				if (prevPrevItem != null)
-				{
-					//add a 'bridge' intermediate item 
-					//to the previous column
-					var bridgeItem;
-					bridgeItem.score=0;
-					bridgeItem.partition=curItem.partition;
-					bridgeItem.name=curItem.name;
-					
-					prevColumn.addItem(bridgeItem);
-				}
+				segment.put("weather",new JSONObject(weather));
 			}
+
+			Thread.currentThread().sleep(200);
 		}
 	}
+}
+```
 
-###2. Prepare the layout
+The function 'getWeatherInfoByTimeAndLocation' fetches weather data from api.worldweatheronline.com for a specific date and lat/long. The WorldWeatherOnline API returns a set of hourly weather observations from the weather station closest to the location and for the date requested. To prevent repeated requests about similar locations and times, the responses are cached on disk against co-ordinates formatted to 3 decimal places and the datetime to nearest day. The appropriate hourly observation is then selected from the response with the following code:
 
-First we sort the columns into date order ( by sorting our 'map' of StreamColumns by the date/column label ). Next we sort each stack into descending score order (we could optionally sort by series name - which would give us a stacked area graph essentially).
+```java
+JSONArray hourly = weather.getJSONArray("hourly");
 
-Finally, we iterate through each column and mark out a stack of rectangles, where the width is defined in 'columnWidth' and the height is the score * yScale. The yScale can be decided in two ways
-
-* (locally scaled/non proportional) The column height in pixels / The total score of that column (all items scores added). This will give a graph where every column is the same total height. Item heights are not comparable scross columns.
-* (proportional/globally scaled) The column height in pixels / The column total score in the whole graph. This makes the item heights comparable across columns.
-
-###3. Draw the graph
-
-Finally, we draw the graph using SVG tags. Essentially we draw a stack of rectangles but with a twist: for each item, we check to see if there is an item of the same series in the previous column, if there isn't, we draw a simple rectangle. If there is however, we draw the a path that starts at the top-right corner of the previous rectangle and follows a Bezier curve to the top left of this item rectangle, following round the rectangle and then back via a bezier curve to the bottom right of the previous rectangle. This creates a nice join between the two columns.
-
-	if (prevItem==null) //just draw rectangle
+JSONObject curWeather = null;
+for (int i=0; i<hourly.length(); i++)
+{
+	curWeather = hourly.getJSONObject(i);
+	long curWeatherTime = dtFmt.parse(dateQuery+" "+curWeather.getString("time")+"00").getTime();
+	if (i==hourly.length()-1) //curWeather is the last observation, use that
 	{
-		curItem.colour = chartItemColours[(colourIdx++) % chartItemColours.length];
-		pathStr = "M"+curItem.left+","+curItem.top+" L"+curItem.right+","+curItem.top+
-			" L"+curItem.right+","+curItem.bottom+" L"+curItem.left+","+curItem.bottom+" Z";
-	}
-	else //draw a rectangle with a Bezier 'join' to the rect of the item in the 
-		 //same series in the previous column
-	{
-		curItem.colour = prevItem.colour;
-		var midX = prevItem.right + ((curItem.left - prevItem.right) / 2);
-		pathStr = "M" + (prevItem.right-1)+","+prevItem.top+" C"+midX+","+
-			prevItem.top+" "+midX+","+curItem.top+" "+curItem.left+","+curItem.top+
-			" L"+curItem.right+","+curItem.top+" L"+curItem.right+","+curItem.bottom+
-			" L"+curItem.left+","+curItem.bottom+
-			" C"+midX+","+curItem.bottom+" "+midX+
-			","+prevItem.bottom+" "+(prevItem.right-1)+","+prevItem.bottom+" Z";
+		break;
 	}
 
-	
-###Example - Temperatures in 2015 in major UK cities. 
+	final JSONObject nextWeather = hourly.getJSONObject(i+1);
+	long nextWeatherTime = dtFmt.parse(dateQuery+" "+nextWeather.getString("time")+"00").getTime();
+	if (time < nextWeatherTime) //requested time is between curWeather and nextWeather
+	{
+		//select the closest observation to the requested time
+		//default is curWeather
+		if ((time-curWeatherTime)>(nextWeatherTime-time))
+		{
+			curWeather=nextWeather;
+		}
+		break;
+	}
+}
+```
 
-The HTML is <a href="/streamgraph/streamgraph.html" target="_blank">here</a>, the Javascript is <a href="/streamgraph/streamgraph.js" target="_blank">here</a> and the data JSON is <a href="/streamgraph/weather-daily-temps-2015-H1.json" target="_blank">here</a>.
+This observation data is then added to the json for each of the segments (plus the start and end of the route). The result looks like this:
+
+```javascript
+...
+"segment": {
+			"country": "United Kingdom",
+			"distance": 237.7,
+			"city": "Manchester",
+			"end_longitude": -2.233929,
+			"end_latitude": 53.473518,
+			"start_latlng": [53.471899, -2.234528],
+			"elevation_low": 41,
+			"starred": false,
+			"end_latlng": [53.473518, -2.233929],
+			"name": "Campus Link Path (Reverse)",
+			"weather": {
+				"temp": 4,
+				"windChill": -3,
+				"description": "Light sleet showers",
+				"windDirDeg": 294,
+				"windDir": "WNW",
+				"iconURL": "http://cdn.worldweatheronline.net/images/wsymbols01_png_64/wsymbol_0013_sleet_showers.png",
+				"time": 0,
+				"windSpeed": 43
+			},
+			"id": 5785697,
+			"state": "England"
+		},
+```
+
+This extra weather information is used by the AJAX front-end code to plot the weather information on a map along with some segment information. (More about this in the next blog post).
+
+All source and webapp code for this project is <a href="/stravaweather/stravaweather.zip">here</a>. You will need to edit the following files to make it work:
+
+1) WEB-INF/web.xml
+
+```xml
+<servlet>
+        <servlet-name>StravaWeatherServlet</servlet-name>
+        <servlet-class>io.wiretrip.stravaweather.StravaWeatherServlet</servlet-class>
+		<init-param>
+			<param-name>webapp_path</param-name>
+			<param-value>http://127.0.0.1:8082/stravaweather/</param-value>
+		</init-param>
+		<init-param>
+			<param-name>strava_client_id</param-name>
+			<param-value>xxxx</param-value>
+		</init-param>
+		<init-param>
+			<param-name>strava_client_secret</param-name>
+			<param-value>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</param-value>
+		</init-param>
+		<init-param>
+			<param-name>weather_api_token</param-name>
+			<param-value>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</param-value>
+		</init-param>
+</servlet>
+```
+
+You will need to set the webapp_path to that of your deployment. The strava_client_id and strava_client_secret are assigned to your application by Strava in the Manage Applications section at <a href="http://labs.strava.com/developers/"> Strava Developers </a>. Likewise, when you register for API access at <a href="http://developer.worldweatheronline.com/api/">World Weather Online</a> you will be given an access token which you need to enter for weather_api_token.
+
+
+

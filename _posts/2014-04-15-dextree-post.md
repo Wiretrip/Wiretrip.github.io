@@ -18,7 +18,7 @@ The answer to both these problems is the 'flat view'; showing all the files in a
 </figure>
 
 
-#Features
+# Features
 
 * Flat File View - Shows all the files in a selected folder, plus all those in subfolders. Optionally shows contents of system and hidden folders too.
 * List view sortable by all columns and with search as you type in each column. Instantly find all the biggest files or newest files on a disk, for example.
