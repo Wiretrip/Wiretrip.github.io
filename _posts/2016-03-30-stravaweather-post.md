@@ -169,7 +169,7 @@ for (int i=0; i<hourly.length(); i++)
 	long nextWeatherTime = 
 		dtFmt.parse(dateQuery+" "+nextWeather.getString("time")+"00").getTime();
 	if (time < nextWeatherTime) //requested time is between 
-	{	//curWeather and nextWeather
+	{				//curWeather and nextWeather
 		//select the closest observation to the requested time
 		//default is curWeather
 		if ((time-curWeatherTime)>(nextWeatherTime-time))
