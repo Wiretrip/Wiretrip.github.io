@@ -77,7 +77,7 @@ StreamColumn.prototype.addItem = function(item)
 By now we have all the data placed into 'date' columns. Optionally, at this point we can fill in some of the blanks, either by insisting that each column 'stack' contains all of the partitions/series and adding 0 scored items where they are not already there, or by 'bridging' series across columns with missing values as below:
 
 <center><figure>
-	<img src="/images/streamgraph/bridge.jpg" alt=""></a>
+	<img src="/images/streamgraph/bridge.jpg" alt=""></img>
 	<figcaption>Columns with a missing 'BRADFORD' bridged.</figcaption>
 </figure></center>
 
@@ -131,7 +131,8 @@ if (prevItem==null) //just draw rectangle
 {
 	curItem.colour = chartItemColours[(colourIdx++) % chartItemColours.length];
 	pathStr = "M"+curItem.left+","+curItem.top+" L"+curItem.right+","+curItem.top+
-		" L"+curItem.right+","+curItem.bottom+" L"+curItem.left+","+curItem.bottom+" Z";
+		" L"+curItem.right+","+curItem.bottom+
+		" L"+curItem.left+","+curItem.bottom+" Z";
 }
 else //draw a rectangle with a Bezier 'join' to the rect of the item in the 
 	 //same series in the previous column
@@ -140,7 +141,8 @@ else //draw a rectangle with a Bezier 'join' to the rect of the item in the
 	var midX = prevItem.right + ((curItem.left - prevItem.right) / 2);
 	pathStr = "M" + (prevItem.right-1)+","+prevItem.top+" C"+midX+","+
 		prevItem.top+" "+midX+","+curItem.top+" "+curItem.left+","+curItem.top+
-		" L"+curItem.right+","+curItem.top+" L"+curItem.right+","+curItem.bottom+
+		" L"+curItem.right+","+curItem.top+
+		" L"+curItem.right+","+curItem.bottom+
 		" L"+curItem.left+","+curItem.bottom+
 		" C"+midX+","+curItem.bottom+" "+midX+
 		","+prevItem.bottom+" "+(prevItem.right-1)+","+prevItem.bottom+" Z";

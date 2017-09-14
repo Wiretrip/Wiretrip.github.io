@@ -118,11 +118,15 @@ for (int i=0; i<segmentEfforts.length(); i++)
 	final JSONObject segmentEffort = segmentEfforts.getJSONObject(i);
 	if (segmentEffort.has("segment") && segmentEffort.has("start_date"))
 	{
-		final long time = stravaDateFormat.parse(segmentEffort.getString("start_date")).getTime();
-		final JSONObject segment = segmentEffort.getJSONObject("segment");
+		final long time = 
+			stravaDateFormat.parse(segmentEffort.getString("start_date")).getTime();
+		final JSONObject segment = 
+			segmentEffort.getJSONObject("segment");
+			
 		if (segment.has("start_latlng"))
 		{
-			final JSONArray startLatLng = segment.getJSONArray("start_latlng");
+			final JSONArray startLatLng = 
+				segment.getJSONArray("start_latlng");
 
 			WeatherInfo weather = 
 				getWeatherInfoByTimeAndLocation(weatherAccessToken, 
@@ -149,14 +153,16 @@ JSONObject curWeather = null;
 for (int i=0; i<hourly.length(); i++)
 {
 	curWeather = hourly.getJSONObject(i);
-	long curWeatherTime = dtFmt.parse(dateQuery+" "+curWeather.getString("time")+"00").getTime();
+	long curWeatherTime = 
+		dtFmt.parse(dateQuery+" "+curWeather.getString("time")+"00").getTime();
 	if (i==hourly.length()-1) //curWeather is the last observation, use that
 	{
 		break;
 	}
 
 	final JSONObject nextWeather = hourly.getJSONObject(i+1);
-	long nextWeatherTime = dtFmt.parse(dateQuery+" "+nextWeather.getString("time")+"00").getTime();
+	long nextWeatherTime = 
+		dtFmt.parse(dateQuery+" "+nextWeather.getString("time")+"00").getTime();
 	if (time < nextWeatherTime) //requested time is between curWeather and nextWeather
 	{
 		//select the closest observation to the requested time
@@ -191,7 +197,7 @@ This observation data is then added to the json for each of the segments (plus t
 				"description": "Light sleet showers",
 				"windDirDeg": 294,
 				"windDir": "WNW",
-				"iconURL": "http://cdn.worldweatheronline.net/images/wsymbols01_png_64/wsymbol_0013_sleet_showers.png",
+				"iconURL": "http://cdn.worldweatheronline.net...sleet_showers.png",
 				"time": 0,
 				"windSpeed": 43
 			},
