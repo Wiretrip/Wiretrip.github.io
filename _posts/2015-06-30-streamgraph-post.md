@@ -77,7 +77,7 @@ StreamColumn.prototype.addItem = function(item)
 By now we have all the data placed into 'date' columns. Optionally, at this point we can fill in some of the blanks, either by insisting that each column 'stack' contains all of the partitions/series and adding 0 scored items where they are not already there, or by 'bridging' series across columns with missing values as below:
 
 <center><figure>
-	<img src="/images/streamgraph/bridge.jpg" alt=""></img>
+	<img src="/images/streamgraph/bridge.jpg" alt=""/>
 	<figcaption>Columns with a missing 'BRADFORD' bridged.</figcaption>
 </figure></center>
 

@@ -119,7 +119,10 @@ for (int i=0; i<segmentEfforts.length(); i++)
 	if (segmentEffort.has("segment") && segmentEffort.has("start_date"))
 	{
 		final long time = 
-			stravaDateFormat.parse(segmentEffort.getString("start_date")).getTime();
+			stravaDateFormat.parse(
+				segmentEffort.getString("start_date")
+			).getTime();
+			
 		final JSONObject segment = 
 			segmentEffort.getJSONObject("segment");
 			
@@ -129,9 +132,11 @@ for (int i=0; i<segmentEfforts.length(); i++)
 				segment.getJSONArray("start_latlng");
 
 			WeatherInfo weather = 
-				getWeatherInfoByTimeAndLocation(weatherAccessToken, 
-												time, startLatLng.getDouble(0), 
-												startLatLng.getDouble(1));
+				getWeatherInfoByTimeAndLocation(
+					weatherAccessToken, 
+					time, startLatLng.getDouble(0), 
+					startLatLng.getDouble(1)
+				);
 
 			if (weather!=null)
 			{
@@ -163,8 +168,8 @@ for (int i=0; i<hourly.length(); i++)
 	final JSONObject nextWeather = hourly.getJSONObject(i+1);
 	long nextWeatherTime = 
 		dtFmt.parse(dateQuery+" "+nextWeather.getString("time")+"00").getTime();
-	if (time < nextWeatherTime) //requested time is between curWeather and nextWeather
-	{
+	if (time < nextWeatherTime) //requested time is between 
+	{							//curWeather and nextWeather
 		//select the closest observation to the requested time
 		//default is curWeather
 		if ((time-curWeatherTime)>(nextWeatherTime-time))
@@ -197,7 +202,7 @@ This observation data is then added to the json for each of the segments (plus t
 				"description": "Light sleet showers",
 				"windDirDeg": 294,
 				"windDir": "WNW",
-				"iconURL": "http://cdn.worldweatheronline.net...sleet_showers.png",
+				"iconURL": "http://cdn.worldweathe...sleet_showers.png",
 				"time": 0,
 				"windSpeed": 43
 			},
