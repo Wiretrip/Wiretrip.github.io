@@ -13,7 +13,7 @@ The hierarchical file system is a wonderful approach to organising files but it 
 The answer to both these problems is the 'flat view'; showing all the files in a selected folder (or whole drive) and all subfolders. Curiously this is not a feature readily found in most file managers (I remember XTree could do it). I decided to write such a file explorer and to throw in a few other features not found on any other file managers. The result was DexTree, implemented in Delphi (Object Pascal) using the lovely <a href="http://www.soft-gems.net/index.php/controls/virtual-treeview">Virtual Treeview</a> control by Mike Lischke. 
 
 <figure>
-	<img src="/images/dextree/dextree-list.jpg" alt=""></a>
+	<img src="/images/dextree/dextree-list.jpg" alt=""/>
 	<figcaption><center>DeXtree application showing list view.</center></figcaption>
 </figure>
 
